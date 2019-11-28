@@ -29,10 +29,6 @@ class City:
     def get_all_possible_cities(self):
         return list(self.possible_cities.keys())
 
-    # @staticmethod
-    # def get_shortest_distance(city_tuple):
-    #     return city_tuple[1]
-
     @staticmethod
     def find_by_name(city_name):
         for element in cities:
@@ -51,7 +47,7 @@ for node in nodes:
     name = node.attrib.get('id')
     x = node.find('./coordinates/x')
     y = node.find('./coordinates/y')
-    cities.append(City(name, x.text, y.text))
+    cities.append(City(name, float(x.text), float(y.text)))
 
 for link in links:
     source = link.find('./source').text
@@ -59,9 +55,12 @@ for link in links:
     setupCost = link.find('./setupCost').text
     for city in cities:
         if city.name == source:
-            city.possible_cities.update({City.find_by_name(target): setupCost})
+            city.possible_cities.update({City.find_by_name(target): float(setupCost)})
         elif city.name == target:
-            city.possible_cities.update({City.find_by_name(source): setupCost})
+            city.possible_cities.update({City.find_by_name(source): float(setupCost)})
+
+
+print(len(cities))
 
 index = 4
 test_city = cities[index]
@@ -74,3 +73,25 @@ for j in test_city.possible_cities:
 
 print('Distance to closest city from city from ', test_city.name, ' is: ',  test_city.get_closest_distance(), ' and this city is: ', test_city.get_closest_city().name)
 print('Distance to another city from city from ', test_city.name, ' is: ',  test_city.get_all_possible_distances()[1], ' and this city is: ', test_city.get_all_possible_cities()[1].name)
+
+# visualize points
+polska = plt.imread("polska.jpg")
+x = []
+y = []
+names = []
+for city in cities:
+    x.append(city.latitude)
+    y.append(city.longitude)
+    names.append(city.name)
+print(x, '::', y)
+print(len(x), '::', len(y))
+
+plt.imshow(polska, extent=[14, 24, 48, 55])
+plt.scatter(x, y)
+
+for i, txt in enumerate(names):
+    plt.annotate(txt, (x[i], y[i]))
+
+plt.show()
+
+# algorithm starts
