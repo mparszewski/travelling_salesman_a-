@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
+import random
+import math
 
 
 class City:
@@ -29,6 +31,14 @@ class City:
     def get_all_possible_cities(self):
         return list(self.possible_cities.keys())
 
+    def count_distance_heuristic(self, to_city):
+        y1 = self.longitude
+        x1 = self.latitude
+        y2 = to_city.longitude
+        x2 = to_city.latitude
+        coefficient = 40075.704 / 360
+        return math.sqrt(((x2 - x1) ** 2) + ((math.cos((x1 * math.pi)/180) * (y2 - y1)) ** 2)) * coefficient
+
     @staticmethod
     def find_by_name(city_name):
         for element in cities:
@@ -47,7 +57,7 @@ for node in nodes:
     name = node.attrib.get('id')
     x = node.find('./coordinates/x')
     y = node.find('./coordinates/y')
-    cities.append(City(name, float(x.text), float(y.text)))
+    cities.append(City(name, float(y.text), float(x.text)))
 
 for link in links:
     source = link.find('./source').text
@@ -62,17 +72,18 @@ for link in links:
 
 print(len(cities))
 
-index = 4
-test_city = cities[index]
+index = 7
+test_city = City.find_by_name('Gdansk')
 print('xml parser check: ')
 print('Selected city: ', test_city.name)
 print('Number of admissible cities to visit', len(test_city.possible_cities))
 for j in test_city.possible_cities:
     print('admissible city: ', j.name, ', and the setup cost is: ', test_city.possible_cities[j])
 
-
-print('Distance to closest city from city from ', test_city.name, ' is: ',  test_city.get_closest_distance(), ' and this city is: ', test_city.get_closest_city().name)
-print('Distance to another city from city from ', test_city.name, ' is: ',  test_city.get_all_possible_distances()[1], ' and this city is: ', test_city.get_all_possible_cities()[1].name)
+print('Distance to closest city from city from ', test_city.name, ' is: ', test_city.get_closest_distance(),
+      ' and this city is: ', test_city.get_closest_city().name)
+print('Distance to another city from city from ', test_city.name, ' is: ', test_city.get_all_possible_distances()[1],
+      ' and this city is: ', test_city.get_all_possible_cities()[1].name)
 
 # visualize points
 polska = plt.imread("polska.jpg")
@@ -80,11 +91,10 @@ x = []
 y = []
 names = []
 for city in cities:
-    x.append(city.latitude)
-    y.append(city.longitude)
+    x.append(city.longitude)
+    y.append(city.latitude)
     names.append(city.name)
 print(x, '::', y)
-print(len(x), '::', len(y))
 
 plt.imshow(polska, extent=[14, 24, 48, 55])
 plt.scatter(x, y)
@@ -95,3 +105,10 @@ for i, txt in enumerate(names):
 plt.show()
 
 # algorithm starts
+visited_cities = []
+first_city = cities[random.randint(0, len(cities) - 1)]
+print(len(first_city.possible_cities))
+
+
+
+# Util functions
